@@ -1,50 +1,56 @@
 const hre = require("hardhat");
 
 async function main() {
-    // -- CONFIGURATION --
-    // replace addresses from yours
-    const RWD_ADDR = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-    const STK_ADDR = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-    const POOL_ADDR = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+    // We use lowercase here to avoid "bad address checksum" errors
+    const RWD_ADDR = "0xaa97a933c61bbc19fb2f109d9c7ebda93e488654".toLowerCase();
+    const STK_ADDR = "0x16a3aabb9f2fd3d19328bfd1edfe196830719087".toLowerCase();
+    const POOL_ADDR = "0x11f405b2b36d884f671ce40a645fa60ea412f917".toLowerCase();
 
-    // Get the account (Owner)
     const [owner] = await hre.ethers.getSigners();
     console.log("interacting with account:", owner.address);
 
-    // Attach to the specific deployed contracts
     const stakingToken = await hre.ethers.getContractAt("MockERC20", STK_ADDR);
     const rewardsToken = await hre.ethers.getContractAt("MockERC20", RWD_ADDR);
     const stakingPool = await hre.ethers.getContractAt("StakingPool", POOL_ADDR);
 
-    // --- ACT 1: SETUP THE POOL (Owner Action) ---
+    // --- ACT 1: SETUP THE POOL ---
     console.log("\n--- Setting up Rewards ---");
 
-    // 1. Send Reward Tokens to the Pool
     const rewardAmount = hre.ethers.parseUnits("1000", 18);
-    await rewardsToken.transfer(POOL_ADDR, rewardAmount);
+
+    // 1. Transfer
+    console.log("Sending transfer transaction...");
+    const tx1 = await rewardsToken.transfer(POOL_ADDR, rewardAmount);
+    await tx1.wait(); // <--- CRITICAL FIX: Wait for block to be mined
     console.log("✅ Transferred 1000 RWD to Pool");
 
-    // 2. Set Duration (e.g., 7 days = 604800 seconds)
-    // For testing locally, we'll use 60 seconds so we can see results fast
-    await stakingPool.setRewardsDuration(60);
+    // 2. Set Duration
+    console.log("Setting duration...");
+    const tx2 = await stakingPool.setRewardsDuration(60);
+    await tx2.wait(); // <--- CRITICAL FIX: Wait so 'duration' is not 0
     console.log("✅ Set duration to 60 seconds");
 
-    // 3. Notify Reward Amount (Starts the clock!)
-    await stakingPool.notifyRewardAmount(rewardAmount);
+    // 3. Notify Reward
+    console.log("Notifying reward amount...");
+    const tx3 = await stakingPool.notifyRewardAmount(rewardAmount);
+    await tx3.wait(); // <--- CRITICAL FIX
     console.log("✅ Notified Reward Amount (Clock started!)");
 
 
-    // --- ACT 2: USER STAKING (User Action) ---
+    // --- ACT 2: USER STAKING ---
     console.log("\n--- Staking Tokens ---");
-
     const stakeAmount = hre.ethers.parseUnits("100", 18);
 
-    // 1. Approve the pool to spend our tokens
-    await stakingToken.approve(POOL_ADDR, stakeAmount);
-    console.log("✅ Approved Pool to spend 100 STK");
+    // 1. Approve
+    console.log("Approving tokens...");
+    const tx4 = await stakingToken.approve(POOL_ADDR, stakeAmount);
+    await tx4.wait(); // <--- CRITICAL FIX
+    console.log("✅ Approved Pool");
 
-    // 2. Stake!
-    await stakingPool.stake(stakeAmount);
+    // 2. Stake
+    console.log("Staking...");
+    const tx5 = await stakingPool.stake(stakeAmount);
+    await tx5.wait(); // <--- CRITICAL FIX
     console.log("✅ Staked 100 STK");
 
 
