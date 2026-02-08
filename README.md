@@ -1,57 +1,57 @@
-# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
+# 🏦 DeFi Staking Pool
 
-This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+A professional-grade Staking dApp built with **Hardhat** and **Solidity**. This project implements a "Synthetix-style" staking algorithm, allowing users to stake ERC20 tokens and earn rewards proportional to their share of the pool and the time staked.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636.svg)
+![Hardhat](https://img.shields.io/badge/Built%20with-Hardhat-yellow.svg)
 
-## Project Overview
+## 🌟 Features
 
-This example project includes:
+* **Time-Based Rewards:** Users earn rewards every second they are staked.
+* **Math Precision:** Uses a "Global Odometer" (Reward Per Token) pattern for O(1) complexity, ensuring gas costs remain low regardless of user count.
+* **Security:** Built with OpenZeppelin v5 (ReentrancyGuard, Ownable, SafeERC20).
+* **Admin Controls:** Owner can set reward durations and fund the pool dynamically.
+* **Comprehensive Testing:** Includes "Time Travel" tests to verify reward accumulation over time.
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+---
 
-## Usage
+## 📂 Project Structure
 
-### Running Tests
+* `contracts/`: Smart contracts (`Staking.sol`, `MockERC20.sol`).
+* `test/`: Hardhat tests ensuring mathematical accuracy.
+* `ignition/modules/`: Deployment modules for Hardhat Ignition.
+* `scripts/`: Interaction scripts for mainnet/testnet and local time manipulation.
 
-To run all the tests in the project, execute the following command:
+---
 
-```shell
+## 🛠️ Setup & Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone <your-repo-url>
+    cd StakingPool
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Configuration**
+    Create a `.env` file in the root directory (do not share this file!).
+    ```ini
+    # .env
+    PRIVATE_KEY="your_wallet_private_key"
+    SEPOLIA_RPC_URL="[https://sepolia.infura.io/v3/YOUR_KEY](https://sepolia.infura.io/v3/YOUR_KEY)"
+    ETHERSCAN_API_KEY="your_etherscan_key"
+    ```
+
+---
+
+## 🧪 Testing
+
+We use Hardhat and Chai for testing. The test suite includes "Time Travel" scenarios to simulate days or weeks of staking in seconds.
+
+```bash
 npx hardhat test
-```
-
-You can also selectively run the Solidity or `mocha` tests:
-
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
-```
-
-### Make a deployment to Sepolia
-
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
-
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
-
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
-
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
-
-After setting the variable, you can run the deployment with the Sepolia network:
-
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
