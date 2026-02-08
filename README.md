@@ -55,3 +55,94 @@ We use Hardhat and Chai for testing. The test suite includes "Time Travel" scena
 
 ```bash
 npx hardhat test
+
+```
+
+**What is tested?**
+
+* ✅ Staking & Withdrawing mechanics.
+* ✅ Reward calculation accuracy (Math verification).
+* ✅ Multi-user scenarios (ensuring no one steals rewards).
+* ✅ Access controls (Owner functions).
+
+---
+
+## 🚀 Deployment
+
+We use **Hardhat Ignition** for robust deployments.
+
+### Option 1: Local Blockchain (Fastest)
+
+Great for development and frontend testing.
+
+1. **Start the Local Node:**
+```bash
+npx hardhat node
+
+```
+
+
+2. **Deploy:**
+```bash
+npx hardhat ignition deploy ignition/modules/Deploy.js --network localhost
+
+```
+
+
+
+### Option 2: Sepolia Testnet (Public)
+
+Deploys to the real Ethereum test network.
+
+```bash
+npx hardhat ignition deploy ignition/modules/Deploy.js --network sepolia
+
+```
+
+---
+
+## 🎮 Interaction Scripts
+
+After deployment, you can interact with your contract using the provided scripts.
+
+### 1. Setup & Stake (`scripts/interact.js`)
+
+This script funds the pool, sets the reward rate, and stakes tokens on behalf of the owner.
+
+* **Note:** If running on Sepolia, make sure to update the addresses in the script first.
+
+```bash
+npx hardhat run scripts/interact.js --network localhost
+# OR
+npx hardhat run scripts/interact.js --network sepolia
+
+```
+
+### 2. Time Travel Debugging (`scripts/checkRewards.js`)
+
+*Only works on `localhost`.*
+This script simulates the passage of time (e.g., fast-forward 30 seconds) to verify rewards without waiting.
+
+```bash
+npx hardhat run scripts/checkRewards.js --network localhost
+
+```
+
+---
+
+## 📜 Contract Details
+
+### StakingPool.sol
+
+* **Staking Token:** The ERC20 token users deposit.
+* **Rewards Token:** The ERC20 token users earn (can be the same or different).
+* **updateReward Modifier:** The heartbeat of the contract. It updates the state whenever a user interacts, ensuring calculations are always precise down to the second.
+
+---
+
+## 🛡️ Security
+
+* **ReentrancyGuard:** Prevents reentrancy attacks on withdraw/claim functions.
+* **SafeERC20:** Handles non-standard ERC20 tokens securely.
+* **Rounding Errors:** Minimized by scaling calculations by `1e18`.
+
