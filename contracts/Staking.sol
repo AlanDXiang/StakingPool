@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.33;
 
 // -- IMPORTS --
 // We use OpenZeppelin for security. In Remix, these imports work automatically.
