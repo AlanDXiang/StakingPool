@@ -18,14 +18,14 @@ contract StakingPool is ReentrancyGuard, Ownable {
     // Duration of the reward period (in seconds)
     uint256 public duration;
     // Timestamp when the reward period ends
-    uint256 public finishAt;
+    uint32 public finishAt;
     // Timestamp of the last update
-    uint256 public updatedAt;
+    uint32 public updatedAt;
     // Rewards emitted per second
     uint256 public rewardRate;
 
     // The Global Odometer (Scaled by 1e18 for precision)
-    uint256 public rewardPerTokenStored;
+    uint192 public rewardPerTokenStored;
 
     // User Snapshots (The "Trip Meter")
     mapping(address => uint256) public userRewardPerTokenPaid;
@@ -58,8 +58,13 @@ contract StakingPool is ReentrancyGuard, Ownable {
     // The "Heartbeat" of the system.
     // It updates the Global Odometer and the User's Snapshot before any action.
     modifier updateReward(address _account) {
-        rewardPerTokenStored = rewardPerToken(); // Update global index
-        updatedAt = lastTimeRewardApplicable(); // Update timestamp
+        // rewardPerTokenStored = rewardPerToken(); // Update global index
+        // updatedAt = lastTimeRewardApplicable(); // Update timestamp
+        // Cast the uint256 result down to uint192
+        rewardPerTokenStored = uint192(rewardPerToken());
+
+        // Cast the uint256 result down to uint32
+        updatedAt = uint32(lastTimeRewardApplicable());
 
         if (_account != address(0)) {
             // Calculate what the user earned since their last interaction
@@ -185,8 +190,13 @@ contract StakingPool is ReentrancyGuard, Ownable {
             "Reward amount > balance"
         );
 
-        finishAt = block.timestamp + duration;
-        updatedAt = block.timestamp;
+        // finishAt = block.timestamp + duration;
+        // updatedAt = block.timestamp;
+        // Cast the calculation result to uint32
+        finishAt = uint32(block.timestamp + duration);
+
+        // Cast the current timestamp to uint32
+        updatedAt = uint32(block.timestamp);
 
         emit RewardAdded(_amount);
     }
